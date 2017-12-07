@@ -3,11 +3,6 @@
 #   http://www.cmake.org/cmake/help/cmake-2-8-docs.html#variable:BUILD_SHARED_LIBS
 # It defaults to shared.
 
-# Make sure this is already defined as a cached variable (@sa tools/libraries.cmake)
-if(NOT DEFINED BUILD_SHARED_LIBS)
-  option(BUILD_SHARED_LIBS "Build dynamically-linked binaries" ON)
-endif()
-
 # Windows/cmake make things difficult if building dll's. 
 # By default:
 #   .dll -> CMAKE_RUNTIME_OUTPUT_DIRECTORY

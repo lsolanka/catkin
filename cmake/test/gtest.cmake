@@ -83,99 +83,13 @@ function(catkin_add_executable_with_gtest target)
 
   assert(GTEST_LIBRARIES)
   target_link_libraries(${target} ${GTEST_LIBRARIES} ${THREADS_LIBRARY})
-
-  # make sure gtest is built before the target
-  add_dependencies(${target} gtest gtest_main)
 endfunction()
 
-find_package(GTest QUIET)
-if(NOT GTEST_FOUND)
-  # only add gtest directory once per workspace
-  if(NOT TARGET gtest)
-    # fall back to system installed path (i.e. on Ubuntu)
-    set(_paths "/usr/src/gtest/src")
-    if(CATKIN_TOPLEVEL)
-      # search in the current workspace before
-      list(INSERT _paths 0 "${CMAKE_SOURCE_DIR}/gtest/src")
-    endif()
-    find_file(_CATKIN_GTEST_SRC "gtest.cc"
-      PATHS ${_paths}
-      NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+hunter_add_package(GTest)
 
-    # fall back to system installed path (i.e. on Ubuntu)
-    set(_paths "/usr/include/gtest")
-    if(CATKIN_TOPLEVEL)
-      # search in the current workspace before
-      list(INSERT _paths 0 "${CMAKE_SOURCE_DIR}/gtest/include/gtest")
-    endif()
-    find_file(_CATKIN_GTEST_INCLUDE "gtest.h"
-      PATHS ${_paths}
-      NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
-
-    if(_CATKIN_GTEST_SRC)
-      get_filename_component(_CATKIN_GTEST_SOURCE_DIR ${_CATKIN_GTEST_SRC} PATH)
-      get_filename_component(_CATKIN_GTEST_BASE_DIR ${_CATKIN_GTEST_SOURCE_DIR} PATH)
-      # add CMakeLists.txt from gtest dir
-      set(_CATKIN_GTEST_BINARY_DIR ${CMAKE_BINARY_DIR}/gtest)
-
-      # overwrite CMake install command to skip install rules for gtest targets
-      # which have been added in version 1.8.0
-      set(_CATKIN_SKIP_INSTALL_RULES TRUE)
-      function(install)
-        if(_CATKIN_SKIP_INSTALL_RULES)
-          return()
-        endif()
-        _install(${ARGN})
-      endfunction()
-      add_subdirectory(${_CATKIN_GTEST_BASE_DIR} ${_CATKIN_GTEST_BINARY_DIR})
-      set(_CATKIN_SKIP_INSTALL_RULES FALSE)
-
-      # mark gtest targets with EXCLUDE_FROM_ALL to only build when tests are built which depend on them
-      set_target_properties(gtest gtest_main PROPERTIES EXCLUDE_FROM_ALL 1)
-      get_filename_component(_CATKIN_GTEST_INCLUDE_DIR ${_CATKIN_GTEST_INCLUDE} PATH)
-      get_filename_component(_CATKIN_GTEST_INCLUDE_DIR ${_CATKIN_GTEST_INCLUDE_DIR} PATH)
-      # set from-source variables
-      set(GTEST_FROM_SOURCE_FOUND TRUE CACHE INTERNAL "")
-      set(GTEST_FROM_SOURCE_INCLUDE_DIRS ${_CATKIN_GTEST_INCLUDE_DIR} CACHE INTERNAL "")
-      set(GTEST_FROM_SOURCE_LIBRARY_DIRS ${_CATKIN_GTEST_BINARY_DIR} CACHE INTERNAL "")
-      set(GTEST_FROM_SOURCE_LIBRARIES "gtest" CACHE INTERNAL "")
-      set(GTEST_FROM_SOURCE_MAIN_LIBRARIES "gtest_main" CACHE INTERNAL "")
-      message(STATUS "Found gtest sources under '${_CATKIN_GTEST_BASE_DIR}': gtests will be built")
-    endif()
-    if(NOT GTEST_FROM_SOURCE_FOUND)
-      if(CATKIN_TOPLEVEL)
-        message(STATUS "gtest not found, C++ tests can not be built. Please install the gtest headers globally in your system or checkout gtest (by running 'svn checkout http://googletest.googlecode.com/svn/tags/release-1.6.0 gtest' in the source space '${CMAKE_SOURCE_DIR}' of your workspace) to enable gtests")
-      else()
-        message(STATUS "gtest not found, C++ tests can not be built. Please install the gtest headers globally in your system to enable gtests")
-      endif()
-    endif()
-  endif()
-  if(GTEST_FROM_SOURCE_FOUND)
-    # set the same variables as find_package()
-    # do NOT set GTEST_FOUND in the cache since when using gtest from source
-    # we must always add the subdirectory to have the gtest targets defined
-    set(GTEST_FOUND ${GTEST_FROM_SOURCE_FOUND})
-    set(GTEST_INCLUDE_DIRS ${GTEST_FROM_SOURCE_INCLUDE_DIRS})
-    set(GTEST_LIBRARY_DIRS ${GTEST_FROM_SOURCE_LIBRARY_DIRS})
-    set(GTEST_LIBRARIES ${GTEST_FROM_SOURCE_LIBRARIES})
-    set(GTEST_MAIN_LIBRARIES ${GTEST_FROM_SOURCE_MAIN_LIBRARIES})
-    set(GTEST_BOTH_LIBRARIES ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES})
-  endif()
-else()
-  message(STATUS "Found gtest: gtests will be built")
-  add_library(gtest UNKNOWN IMPORTED)
-  set_target_properties(gtest PROPERTIES IMPORTED_LOCATION "${GTEST_LIBRARIES}")
-  add_library(gtest_main UNKNOWN IMPORTED)
-  set_target_properties(gtest_main PROPERTIES IMPORTED_LOCATION "${GTEST_MAIN_LIBRARIES}")
-  set(GTEST_FOUND ${GTEST_FOUND} CACHE INTERNAL "")
-  set(GTEST_INCLUDE_DIRS ${GTEST_INCLUDE_DIRS} CACHE INTERNAL "")
-  set(GTEST_LIBRARIES ${GTEST_LIBRARIES} CACHE INTERNAL "")
-  set(GTEST_MAIN_LIBRARIES ${GTEST_MAIN_LIBRARIES} CACHE INTERNAL "")
-  set(GTEST_BOTH_LIBRARIES ${GTEST_BOTH_LIBRARIES} CACHE INTERNAL "")
-endif()
-# For Visual C++, need to increase variadic template size to build gtest
-if(GTEST_FOUND)
-  if(WIN32) 
-    add_definitions(/D _VARIADIC_MAX=10)
-  endif()
-endif()
+find_package(GTest CONFIG REQUIRED)
+message(STATUS "Using hunterised GTest: gtests will be built")
+set(GMOCK_LIBRARIES GMock::main CACHE INTERNAL "")
+set(GTEST_LIBRARIES GTest::main CACHE INTERNAL "")
+set(GMOCK_FOUND TRUE)
+set(GTEST_FOUND TRUE)

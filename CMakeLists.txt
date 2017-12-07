@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 2.8.3)
 
 set(catkin_EXTRAS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
+include(cmake/HunterGate.cmake)
+HunterGate(
+    URL "https://github.com/lsolanka/hunter/archive/ros-hunter.tar.gz"
+    SHA1 "36f40fa452f70dafe1a4d99c9f15bfbe9ea185f9"
+)
+
 project(catkin)
 
 if(NOT DEFINED CATKIN_TOPLEVEL)

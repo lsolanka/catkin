@@ -116,7 +116,38 @@ if(NOT "@PROJECT_CMAKE_CONFIG_INCLUDE_DIRS@ " STREQUAL " ")
   endforeach()
 endif()
 
-set(libraries "@PKG_CONFIG_LIBRARIES@")
+set(depends "@PROJECT_DEPENDENCIES@")
+foreach(depend ${depends})
+  string(REPLACE " " ";" depend_list ${depend})
+  # the package name of the dependency must be kept in a unique variable so that it is not overwritten in recursive calls
+  list(GET depend_list 0 @PROJECT_NAME@_dep)
+  list(LENGTH depend_list count)
+  if(${count} EQUAL 1)
+    # simple dependencies must only be find_package()-ed once
+    if(NOT ${@PROJECT_NAME@_dep}_FOUND)
+      find_package(${@PROJECT_NAME@_dep} REQUIRED NO_MODULE)
+    endif()
+  else()
+    # dependencies with components must be find_package()-ed again
+    list(REMOVE_AT depend_list 0)
+    find_package(${@PROJECT_NAME@_dep} REQUIRED NO_MODULE ${depend_list})
+  endif()
+endforeach()
+
+#  - in develspace, we do it the old catkin way, except that we do not unpack and
+#    deduplicate the libs, they stay as targets
+#  - in installspace, we really only need the exported targets
+#    This retains backwards compatibility so that no code needs to change what is
+#    in PROJECT_LIBRARIES when compiling with (non-hunterised) catkin_make
+if("@DEVELSPACE@" STREQUAL "FALSE")
+  if(NOT "@PROJECT_INSTALLSPACE_LIBRARIES@" STREQUAL "")
+    include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake)
+  endif()
+  set(libraries "@PROJECT_INSTALLSPACE_LIBRARIES@")
+else()
+  set(libraries "@PKG_CONFIG_LIBRARIES@")
+endif()
+
 foreach(library ${libraries})
   # keep build configuration keywords, target names and absolute libraries as-is
   if("${library}" MATCHES "^(debug|optimized|general)$")
@@ -158,35 +189,6 @@ foreach(t ${@PROJECT_NAME@_EXPORTED_TARGETS})
   if(NOT TARGET ${t})
     add_custom_target(${t})
   endif()
-endforeach()
-
-set(depends "@PROJECT_DEPENDENCIES@")
-foreach(depend ${depends})
-  string(REPLACE " " ";" depend_list ${depend})
-  # the package name of the dependency must be kept in a unique variable so that it is not overwritten in recursive calls
-  list(GET depend_list 0 @PROJECT_NAME@_dep)
-  list(LENGTH depend_list count)
-  if(${count} EQUAL 1)
-    # simple dependencies must only be find_package()-ed once
-    if(NOT ${@PROJECT_NAME@_dep}_FOUND)
-      find_package(${@PROJECT_NAME@_dep} REQUIRED NO_MODULE)
-    endif()
-  else()
-    # dependencies with components must be find_package()-ed again
-    list(REMOVE_AT depend_list 0)
-    find_package(${@PROJECT_NAME@_dep} REQUIRED NO_MODULE ${depend_list})
-  endif()
-  _list_append_unique(@PROJECT_NAME@_INCLUDE_DIRS ${${@PROJECT_NAME@_dep}_INCLUDE_DIRS})
-
-  # merge build configuration keywords with library names to correctly deduplicate
-  _pack_libraries_with_build_configuration(@PROJECT_NAME@_LIBRARIES ${@PROJECT_NAME@_LIBRARIES})
-  _pack_libraries_with_build_configuration(_libraries ${${@PROJECT_NAME@_dep}_LIBRARIES})
-  _list_append_deduplicate(@PROJECT_NAME@_LIBRARIES ${_libraries})
-  # undo build configuration keyword merging after deduplication
-  _unpack_libraries_with_build_configuration(@PROJECT_NAME@_LIBRARIES ${@PROJECT_NAME@_LIBRARIES})
-
-  _list_append_unique(@PROJECT_NAME@_LIBRARY_DIRS ${${@PROJECT_NAME@_dep}_LIBRARY_DIRS})
-  list(APPEND @PROJECT_NAME@_EXPORTED_TARGETS ${${@PROJECT_NAME@_dep}_EXPORTED_TARGETS})
 endforeach()
 
 set(pkg_cfg_extras "@PKG_CFG_EXTRAS@")

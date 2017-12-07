@@ -91,15 +91,16 @@ if(catkin_FIND_COMPONENTS)
           NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
       endif()
 
-      # append component-specific variables to catkin_* variables
+      ## append component-specific variables to catkin_* variables
       list_append_unique(catkin_INCLUDE_DIRS ${${component}_INCLUDE_DIRS})
 
-      # merge build configuration keywords with library names to correctly deduplicate
-      catkin_pack_libraries_with_build_configuration(catkin_LIBRARIES ${catkin_LIBRARIES})
-      catkin_pack_libraries_with_build_configuration(_libraries ${${component}_LIBRARIES})
-      list_append_deduplicate(catkin_LIBRARIES ${_libraries})
-      # undo build configuration keyword merging after deduplication
-      catkin_unpack_libraries_with_build_configuration(catkin_LIBRARIES ${catkin_LIBRARIES})
+      ## merge build configuration keywords with library names to correctly deduplicate
+      #catkin_pack_libraries_with_build_configuration(catkin_LIBRARIES ${catkin_LIBRARIES})
+      #catkin_pack_libraries_with_build_configuration(_libraries ${${component}_LIBRARIES})
+      #list_append_deduplicate(catkin_LIBRARIES ${_libraries})
+      ## undo build configuration keyword merging after deduplication
+      #catkin_unpack_libraries_with_build_configuration(catkin_LIBRARIES ${catkin_LIBRARIES})
+      list(APPEND catkin_LIBRARIES ${${component}_LIBRARIES})
 
       list_append_unique(catkin_LIBRARY_DIRS ${${component}_LIBRARY_DIRS})
       list(APPEND catkin_EXPORTED_TARGETS ${${component}_EXPORTED_TARGETS})
