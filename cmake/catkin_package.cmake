@@ -250,120 +250,120 @@ function(_catkin_package)
   if(PROJECT_LIBRARIES)
     list(APPEND _PKG_CONFIG_LIBRARIES ${PROJECT_LIBRARIES})
   endif()
-  if(PROJECT_DEPENDENCIES_LIBRARIES)
-    list(APPEND _PKG_CONFIG_LIBRARIES ${PROJECT_DEPENDENCIES_LIBRARIES})
-  endif()
+  #if(PROJECT_DEPENDENCIES_LIBRARIES)
+  #  list(APPEND _PKG_CONFIG_LIBRARIES ${PROJECT_DEPENDENCIES_LIBRARIES})
+  #endif()
 
   # resolve imported library targets
   catkin_replace_imported_library_targets(_PKG_CONFIG_LIBRARIES ${_PKG_CONFIG_LIBRARIES})
 
   # deduplicate libraries while maintaining build configuration keywords
   catkin_pack_libraries_with_build_configuration(_PKG_CONFIG_LIBRARIES ${_PKG_CONFIG_LIBRARIES})
-  set(PKG_CONFIG_LIBRARIES "")
-  foreach(library ${_PKG_CONFIG_LIBRARIES})
-    list_append_deduplicate(PKG_CONFIG_LIBRARIES ${library})
-  endforeach()
-  catkin_unpack_libraries_with_build_configuration(PKG_CONFIG_LIBRARIES ${PKG_CONFIG_LIBRARIES})
+  set(PKG_CONFIG_LIBRARIES ${_PKG_CONFIG_LIBRARIES})
+  #foreach(library ${_PKG_CONFIG_LIBRARIES})
+  #  list_append_deduplicate(PKG_CONFIG_LIBRARIES ${library})
+  #endforeach()
+  #catkin_unpack_libraries_with_build_configuration(PKG_CONFIG_LIBRARIES ${PKG_CONFIG_LIBRARIES})
 
-  # .pc files can not handle build configuration keywords therefore filter them out based on the current build type
-  set(PKG_CONFIG_LIBRARIES_WITH_PREFIX "")
-  catkin_filter_libraries_for_build_configuration(libraries ${PKG_CONFIG_LIBRARIES})
-  foreach(library ${libraries})
-    if(NOT IS_ABSOLUTE ${library})
-      set(library "-l${library}")
-    endif()
-    list_append_deduplicate(PKG_CONFIG_LIBRARIES_WITH_PREFIX ${library})
-  endforeach()
+  ## .pc files can not handle build configuration keywords therefore filter them out based on the current build type
+  #set(PKG_CONFIG_LIBRARIES_WITH_PREFIX "")
+  #catkin_filter_libraries_for_build_configuration(libraries ${PKG_CONFIG_LIBRARIES})
+  #foreach(library ${libraries})
+  #  if(NOT IS_ABSOLUTE ${library})
+  #    set(library "-l${library}")
+  #  endif()
+  #  list_append_deduplicate(PKG_CONFIG_LIBRARIES_WITH_PREFIX ${library})
+  #endforeach()
 
   #
   # DEVEL SPACE
   #
 
   # used in the cmake extra files
-  set(DEVELSPACE TRUE)
-  set(INSTALLSPACE FALSE)
+  #set(DEVELSPACE TRUE)
+  #set(INSTALLSPACE FALSE)
 
-  set(PROJECT_SPACE_DIR ${CATKIN_DEVEL_PREFIX})
-  set(PKG_INCLUDE_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
+  #set(PROJECT_SPACE_DIR ${CATKIN_DEVEL_PREFIX})
+  #set(PKG_INCLUDE_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
 
-  # absolute path to include dirs and validate that they are existing either absolute or relative to packages source
-  set(PROJECT_CMAKE_CONFIG_INCLUDE_DIRS "")
-  set(PROJECT_PKG_CONFIG_INCLUDE_DIRS "")
-  foreach(idir ${PROJECT_INCLUDE_DIRS})
-    if(IS_ABSOLUTE ${idir})
-      if(IS_DIRECTORY ${idir})
-        set(include ${idir})
-      else()
-        message(FATAL_ERROR "catkin_package() absolute include dir '${idir}' does not exist")
-      endif()
-    elseif(IS_DIRECTORY ${PKG_INCLUDE_PREFIX}/${idir})
-      set(include ${PKG_INCLUDE_PREFIX}/${idir})
-    else()
-      message(FATAL_ERROR "catkin_package() include dir '${idir}' does not exist relative to '${PKG_INCLUDE_PREFIX}'")
-    endif()
-    list_append_unique(PROJECT_CMAKE_CONFIG_INCLUDE_DIRS ${include})
-    list_append_unique(PROJECT_PKG_CONFIG_INCLUDE_DIRS ${include})
-  endforeach()
-  if(PROJECT_DEPENDENCIES_INCLUDE_DIRS)
-    list_append_unique(PROJECT_CMAKE_CONFIG_INCLUDE_DIRS ${PROJECT_DEPENDENCIES_INCLUDE_DIRS})
-    list_append_unique(PROJECT_PKG_CONFIG_INCLUDE_DIRS ${PROJECT_DEPENDENCIES_INCLUDE_DIRS})
-  endif()
+  ## absolute path to include dirs and validate that they are existing either absolute or relative to packages source
+  #set(PROJECT_CMAKE_CONFIG_INCLUDE_DIRS "")
+  #set(PROJECT_PKG_CONFIG_INCLUDE_DIRS "")
+  #foreach(idir ${PROJECT_INCLUDE_DIRS})
+  #  if(IS_ABSOLUTE ${idir})
+  #    if(IS_DIRECTORY ${idir})
+  #      set(include ${idir})
+  #    else()
+  #      message(FATAL_ERROR "catkin_package() absolute include dir '${idir}' does not exist")
+  #    endif()
+  #  elseif(IS_DIRECTORY ${PKG_INCLUDE_PREFIX}/${idir})
+  #    set(include ${PKG_INCLUDE_PREFIX}/${idir})
+  #  else()
+  #    message(FATAL_ERROR "catkin_package() include dir '${idir}' does not exist relative to '${PKG_INCLUDE_PREFIX}'")
+  #  endif()
+  #  list_append_unique(PROJECT_CMAKE_CONFIG_INCLUDE_DIRS ${include})
+  #  list_append_unique(PROJECT_PKG_CONFIG_INCLUDE_DIRS ${include})
+  #endforeach()
+  #if(PROJECT_DEPENDENCIES_INCLUDE_DIRS)
+  #  list_append_unique(PROJECT_CMAKE_CONFIG_INCLUDE_DIRS ${PROJECT_DEPENDENCIES_INCLUDE_DIRS})
+  #  list_append_unique(PROJECT_PKG_CONFIG_INCLUDE_DIRS ${PROJECT_DEPENDENCIES_INCLUDE_DIRS})
+  #endif()
 
-  # prepend library path of this workspace
-  set(PKG_CONFIG_LIB_PATHS ${lib_paths})
-  list(INSERT PKG_CONFIG_LIB_PATHS 0 ${PROJECT_SPACE_DIR}/lib)
-  set(PKG_CMAKE_DIR ${PROJECT_SPACE_DIR}/share/${PROJECT_NAME}/cmake)
-  if("${PROJECT_NAME}" STREQUAL "catkin")
-    set(PKG_CMAKE_DIR "${catkin_EXTRAS_DIR}")
-  endif()
+  ## prepend library path of this workspace
+  #set(PKG_CONFIG_LIB_PATHS ${lib_paths})
+  #list(INSERT PKG_CONFIG_LIB_PATHS 0 ${PROJECT_SPACE_DIR}/lib)
+  #set(PKG_CMAKE_DIR ${PROJECT_SPACE_DIR}/share/${PROJECT_NAME}/cmake)
+  #if("${PROJECT_NAME}" STREQUAL "catkin")
+  #  set(PKG_CMAKE_DIR "${catkin_EXTRAS_DIR}")
+  #endif()
 
-  if(NOT PROJECT_SKIP_PKG_CONFIG_GENERATION)
-    # ensure that output folder exists
-    file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/lib/pkgconfig)
-    # generate devel space pc for project
-    em_expand(${catkin_EXTRAS_DIR}/templates/pkg.context.pc.in
-      ${CMAKE_CURRENT_BINARY_DIR}/catkin_generated/pkg.develspace.context.pc.py
-      ${catkin_EXTRAS_DIR}/em/pkg.pc.em
-      ${CATKIN_DEVEL_PREFIX}/lib/pkgconfig/${PROJECT_NAME}.pc)
-  endif()
+  #if(NOT PROJECT_SKIP_PKG_CONFIG_GENERATION)
+  #  # ensure that output folder exists
+  #  file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/lib/pkgconfig)
+  #  # generate devel space pc for project
+  #  em_expand(${catkin_EXTRAS_DIR}/templates/pkg.context.pc.in
+  #    ${CMAKE_CURRENT_BINARY_DIR}/catkin_generated/pkg.develspace.context.pc.py
+  #    ${catkin_EXTRAS_DIR}/em/pkg.pc.em
+  #    ${CATKIN_DEVEL_PREFIX}/lib/pkgconfig/${PROJECT_NAME}.pc)
+  #endif()
 
-  # generate devel space cfg-extras for project
-  set(PKG_CFG_EXTRAS "")
-  foreach(extra ${${PROJECT_NAME}_CFG_EXTRAS} ${PROJECT_CFG_EXTRAS})
-    if(IS_ABSOLUTE ${extra})
-      set(base ${extra})
-      get_filename_component(extra ${extra} NAME)
-    else()
-      set(base ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${extra})
-    endif()
-    if(EXISTS ${base}.em OR EXISTS ${base}.develspace.em)
-      if(EXISTS ${base}.develspace.em)
-        set(em_template ${base}.develspace.em)
-      else()
-        set(em_template ${base}.em)
-      endif()
-      em_expand(${catkin_EXTRAS_DIR}/templates/cfg-extras.context.py.in
-        ${CMAKE_CURRENT_BINARY_DIR}/catkin_generated/${extra}.develspace.context.cmake.py
-        ${em_template}
-        ${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}/cmake/${extra})
-      list(APPEND PKG_CFG_EXTRAS ${extra})
-    elseif(EXISTS ${base}.in OR EXISTS ${base}.develspace.in)
-      if(EXISTS ${base}.develspace.in)
-        set(in_template ${base}.develspace.in)
-      else()
-        set(in_template ${base}.in)
-      endif()
-      configure_file(${in_template}
-        ${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}/cmake/${extra}
-        @ONLY
-      )
-      list(APPEND PKG_CFG_EXTRAS ${extra})
-    elseif(EXISTS ${base})
-      list(APPEND PKG_CFG_EXTRAS ${base})
-    elseif(NOT EXISTS ${base}.installspace.em AND NOT EXISTS ${base}.installspace.in)
-      message(FATAL_ERROR "catkin_package() could not find CFG_EXTRAS file.  Either 'cmake/${extra}.develspace.em', 'cmake/${extra}.em', 'cmake/${extra}.develspace.in', 'cmake/${extra}.in', 'cmake/${extra}' or a variant specific to the installspace must exist.")
-    endif()
-  endforeach()
+  ## generate devel space cfg-extras for project
+  #set(PKG_CFG_EXTRAS "")
+  #foreach(extra ${${PROJECT_NAME}_CFG_EXTRAS} ${PROJECT_CFG_EXTRAS})
+  #  if(IS_ABSOLUTE ${extra})
+  #    set(base ${extra})
+  #    get_filename_component(extra ${extra} NAME)
+  #  else()
+  #    set(base ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${extra})
+  #  endif()
+  #  if(EXISTS ${base}.em OR EXISTS ${base}.develspace.em)
+  #    if(EXISTS ${base}.develspace.em)
+  #      set(em_template ${base}.develspace.em)
+  #    else()
+  #      set(em_template ${base}.em)
+  #    endif()
+  #    em_expand(${catkin_EXTRAS_DIR}/templates/cfg-extras.context.py.in
+  #      ${CMAKE_CURRENT_BINARY_DIR}/catkin_generated/${extra}.develspace.context.cmake.py
+  #      ${em_template}
+  #      ${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}/cmake/${extra})
+  #    list(APPEND PKG_CFG_EXTRAS ${extra})
+  #  elseif(EXISTS ${base}.in OR EXISTS ${base}.develspace.in)
+  #    if(EXISTS ${base}.develspace.in)
+  #      set(in_template ${base}.develspace.in)
+  #    else()
+  #      set(in_template ${base}.in)
+  #    endif()
+  #    configure_file(${in_template}
+  #      ${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}/cmake/${extra}
+  #      @ONLY
+  #    )
+  #    list(APPEND PKG_CFG_EXTRAS ${extra})
+  #  elseif(EXISTS ${base})
+  #    list(APPEND PKG_CFG_EXTRAS ${base})
+  #  elseif(NOT EXISTS ${base}.installspace.em AND NOT EXISTS ${base}.installspace.in)
+  #    message(FATAL_ERROR "catkin_package() could not find CFG_EXTRAS file.  Either 'cmake/${extra}.develspace.em', 'cmake/${extra}.em', 'cmake/${extra}.develspace.in', 'cmake/${extra}.in', 'cmake/${extra}' or a variant specific to the installspace must exist.")
+  #  endif()
+  #endforeach()
 
   if(NOT PROJECT_SKIP_CMAKE_CONFIG_GENERATION)
     set(PKG_EXPORTED_TARGETS ${${PROJECT_NAME}_EXPORTED_TARGETS} ${PROJECT_EXPORTED_TARGETS})
