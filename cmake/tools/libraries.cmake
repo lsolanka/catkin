@@ -7,11 +7,6 @@
 # via the mingw cross compiler, though embedded builds
 # could be feasibly built this way also (largely untested).
 
-# Make sure this is already defined as a cached variable (@sa platform/windows.cmake)
-if(NOT DEFINED BUILD_SHARED_LIBS)
-  option(BUILD_SHARED_LIBS "Build dynamically-linked binaries" ON)
-endif()
-
 function(configure_shared_library_build_settings)
   if(BUILD_SHARED_LIBS)
     message(STATUS "BUILD_SHARED_LIBS is on")
