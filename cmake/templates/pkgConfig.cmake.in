@@ -134,7 +134,7 @@ foreach(depend ${depends})
   endif()
 endforeach()
 
-if("@PKG_CONFIG_LIBRARIES@" NOT STREQUAL "")
+if(NOT "@PKG_CONFIG_LIBRARIES@" STREQUAL "")
     include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake)
 endif()
 
