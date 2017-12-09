@@ -140,10 +140,10 @@ endforeach()
 #    This retains backwards compatibility so that no code needs to change what is
 #    in PROJECT_LIBRARIES when compiling with (non-hunterised) catkin_make
 if("@DEVELSPACE@" STREQUAL "FALSE")
-  if(NOT "@PROJECT_EXPORTED_TARGETS@" STREQUAL "")
+  if(NOT "@INSTALLSPACE_LIBRARIES@" STREQUAL "")
     include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake)
   endif()
-  set(libraries "@PROJECT_EXPORTED_TARGETS@")
+  set(libraries "@INSTALLSPACE_LIBRARIES@")
 else()
   set(libraries "@PKG_CONFIG_LIBRARIES@")
   list(APPEND @PROJECT_NAME@_LIBRARIES @PROJECT_DEVELSPACE_LIBRARIES@)
