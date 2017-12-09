@@ -279,52 +279,52 @@ function(_catkin_package)
   #
 
   # used in the cmake extra files
-  #set(DEVELSPACE TRUE)
-  #set(INSTALLSPACE FALSE)
+  set(DEVELSPACE TRUE)
+  set(INSTALLSPACE FALSE)
 
-  #set(PROJECT_SPACE_DIR ${CATKIN_DEVEL_PREFIX})
-  #set(PKG_INCLUDE_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
+  set(PROJECT_SPACE_DIR ${CATKIN_DEVEL_PREFIX})
+  set(PKG_INCLUDE_PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
 
-  ## absolute path to include dirs and validate that they are existing either absolute or relative to packages source
-  #set(PROJECT_CMAKE_CONFIG_INCLUDE_DIRS "")
-  #set(PROJECT_PKG_CONFIG_INCLUDE_DIRS "")
-  #foreach(idir ${PROJECT_INCLUDE_DIRS})
-  #  if(IS_ABSOLUTE ${idir})
-  #    if(IS_DIRECTORY ${idir})
-  #      set(include ${idir})
-  #    else()
-  #      message(FATAL_ERROR "catkin_package() absolute include dir '${idir}' does not exist")
-  #    endif()
-  #  elseif(IS_DIRECTORY ${PKG_INCLUDE_PREFIX}/${idir})
-  #    set(include ${PKG_INCLUDE_PREFIX}/${idir})
-  #  else()
-  #    message(FATAL_ERROR "catkin_package() include dir '${idir}' does not exist relative to '${PKG_INCLUDE_PREFIX}'")
-  #  endif()
-  #  list_append_unique(PROJECT_CMAKE_CONFIG_INCLUDE_DIRS ${include})
-  #  list_append_unique(PROJECT_PKG_CONFIG_INCLUDE_DIRS ${include})
-  #endforeach()
-  #if(PROJECT_DEPENDENCIES_INCLUDE_DIRS)
-  #  list_append_unique(PROJECT_CMAKE_CONFIG_INCLUDE_DIRS ${PROJECT_DEPENDENCIES_INCLUDE_DIRS})
-  #  list_append_unique(PROJECT_PKG_CONFIG_INCLUDE_DIRS ${PROJECT_DEPENDENCIES_INCLUDE_DIRS})
-  #endif()
+  # absolute path to include dirs and validate that they are existing either absolute or relative to packages source
+  set(PROJECT_CMAKE_CONFIG_INCLUDE_DIRS "")
+  set(PROJECT_PKG_CONFIG_INCLUDE_DIRS "")
+  foreach(idir ${PROJECT_INCLUDE_DIRS})
+    if(IS_ABSOLUTE ${idir})
+      if(IS_DIRECTORY ${idir})
+        set(include ${idir})
+      else()
+        message(FATAL_ERROR "catkin_package() absolute include dir '${idir}' does not exist")
+      endif()
+    elseif(IS_DIRECTORY ${PKG_INCLUDE_PREFIX}/${idir})
+      set(include ${PKG_INCLUDE_PREFIX}/${idir})
+    else()
+      message(FATAL_ERROR "catkin_package() include dir '${idir}' does not exist relative to '${PKG_INCLUDE_PREFIX}'")
+    endif()
+    list_append_unique(PROJECT_CMAKE_CONFIG_INCLUDE_DIRS ${include})
+    list_append_unique(PROJECT_PKG_CONFIG_INCLUDE_DIRS ${include})
+  endforeach()
+  if(PROJECT_DEPENDENCIES_INCLUDE_DIRS)
+    list_append_unique(PROJECT_CMAKE_CONFIG_INCLUDE_DIRS ${PROJECT_DEPENDENCIES_INCLUDE_DIRS})
+    list_append_unique(PROJECT_PKG_CONFIG_INCLUDE_DIRS ${PROJECT_DEPENDENCIES_INCLUDE_DIRS})
+  endif()
 
-  ## prepend library path of this workspace
-  #set(PKG_CONFIG_LIB_PATHS ${lib_paths})
-  #list(INSERT PKG_CONFIG_LIB_PATHS 0 ${PROJECT_SPACE_DIR}/lib)
-  #set(PKG_CMAKE_DIR ${PROJECT_SPACE_DIR}/share/${PROJECT_NAME}/cmake)
-  #if("${PROJECT_NAME}" STREQUAL "catkin")
-  #  set(PKG_CMAKE_DIR "${catkin_EXTRAS_DIR}")
-  #endif()
+  # prepend library path of this workspace
+  set(PKG_CONFIG_LIB_PATHS ${lib_paths})
+  list(INSERT PKG_CONFIG_LIB_PATHS 0 ${PROJECT_SPACE_DIR}/lib)
+  set(PKG_CMAKE_DIR ${PROJECT_SPACE_DIR}/share/${PROJECT_NAME}/cmake)
+  if("${PROJECT_NAME}" STREQUAL "catkin")
+    set(PKG_CMAKE_DIR "${catkin_EXTRAS_DIR}")
+  endif()
 
-  #if(NOT PROJECT_SKIP_PKG_CONFIG_GENERATION)
-  #  # ensure that output folder exists
-  #  file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/lib/pkgconfig)
-  #  # generate devel space pc for project
-  #  em_expand(${catkin_EXTRAS_DIR}/templates/pkg.context.pc.in
-  #    ${CMAKE_CURRENT_BINARY_DIR}/catkin_generated/pkg.develspace.context.pc.py
-  #    ${catkin_EXTRAS_DIR}/em/pkg.pc.em
-  #    ${CATKIN_DEVEL_PREFIX}/lib/pkgconfig/${PROJECT_NAME}.pc)
-  #endif()
+  if(NOT PROJECT_SKIP_PKG_CONFIG_GENERATION)
+    # ensure that output folder exists
+    file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/lib/pkgconfig)
+    # generate devel space pc for project
+    em_expand(${catkin_EXTRAS_DIR}/templates/pkg.context.pc.in
+      ${CMAKE_CURRENT_BINARY_DIR}/catkin_generated/pkg.develspace.context.pc.py
+      ${catkin_EXTRAS_DIR}/em/pkg.pc.em
+      ${CATKIN_DEVEL_PREFIX}/lib/pkgconfig/${PROJECT_NAME}.pc)
+  endif()
 
   # generate devel space cfg-extras for project
   set(PKG_CFG_EXTRAS "")
@@ -385,6 +385,12 @@ function(_catkin_package)
     configure_file(${catkin_EXTRAS_DIR}/templates/pkgConfig-version.cmake.in
       ${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}/cmake/${PROJECT_NAME}Config-version.cmake
       @ONLY
+    )
+    # Generaty a dummy Targets.cmake file for the devel space (all targets must
+    # be listed explicitly
+    file(GENERATE
+      ${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}/cmake/${PROJECT_NAME}Targets.cmake
+      CONTENT ""
     )
   endif()
 
