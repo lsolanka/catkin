@@ -146,7 +146,6 @@ if("@DEVELSPACE@" STREQUAL "FALSE")
   set(libraries "@INSTALLSPACE_LIBRARIES@")
 else()
   set(libraries "@PKG_CONFIG_LIBRARIES@")
-  list(APPEND @PROJECT_NAME@_LIBRARIES @PROJECT_DEVELSPACE_LIBRARIES@)
 endif()
 
 foreach(library ${libraries})
