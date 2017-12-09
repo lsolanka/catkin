@@ -387,12 +387,6 @@ function(_catkin_package)
       ${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}/cmake/${PROJECT_NAME}Config-version.cmake
       @ONLY
     )
-    # Generaty a dummy Targets.cmake file for the devel space (all targets must
-    # be listed explicitly
-    file(GENERATE
-      OUTPUT ${CATKIN_DEVEL_PREFIX}/share/${PROJECT_NAME}/cmake/${PROJECT_NAME}Targets.cmake
-      CONTENT ""
-    )
   endif()
 
   #
