@@ -92,7 +92,7 @@ if(catkin_FIND_COMPONENTS)
       endif()
 
       ## append component-specific variables to catkin_* variables
-      #list_append_unique(catkin_INCLUDE_DIRS ${${component}_INCLUDE_DIRS})
+      list_append_unique(catkin_INCLUDE_DIRS ${${component}_INCLUDE_DIRS})
 
       ## merge build configuration keywords with library names to correctly deduplicate
       #catkin_pack_libraries_with_build_configuration(catkin_LIBRARIES ${catkin_LIBRARIES})
