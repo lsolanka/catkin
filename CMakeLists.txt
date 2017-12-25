@@ -4,8 +4,8 @@ set(catkin_EXTRAS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include(cmake/HunterGate.cmake)
 HunterGate(
-    URL "https://github.com/lsolanka/hunter/archive/ros-hunter.tar.gz"
-    SHA1 "36f40fa452f70dafe1a4d99c9f15bfbe9ea185f9"
+    URL "https://github.com/ruslo/hunter/archive/v0.19.210.tar.gz"
+    SHA1 "87eb902de6ca89e1dafc71e475344f523ef67729"
 )
 
 project(catkin)
