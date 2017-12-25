@@ -132,6 +132,10 @@ foreach(depend ${depends})
     list(REMOVE_AT depend_list 0)
     find_package(${@PROJECT_NAME@_dep} REQUIRED NO_MODULE ${depend_list})
   endif()
+  _list_append_unique(@PROJECT_NAME@_INCLUDE_DIRS ${${@PROJECT_NAME@_dep}_INCLUDE_DIRS})
+
+  _list_append_unique(@PROJECT_NAME@_LIBRARY_DIRS ${${@PROJECT_NAME@_dep}_LIBRARY_DIRS})
+  list(APPEND @PROJECT_NAME@_EXPORTED_TARGETS ${${@PROJECT_NAME@_dep}_EXPORTED_TARGETS})
 endforeach()
 
 #  - in develspace, we do it the old catkin way, except that we do not unpack and
